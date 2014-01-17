@@ -22,7 +22,7 @@ This is an API client for Broadstreet Ads. Usage of this client requires that yo
     }
     catch(Exception $ex)
     {
-        echo "Whoops, there was a problem connecting to Broadstreet:" . $ex__toString();
+        echo "Whoops, there was a problem connecting to Broadstreet:" . $ex->__toString();
     }
 
 ## License
