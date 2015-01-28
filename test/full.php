@@ -58,7 +58,7 @@ $placement_del = $api->createPlacement($network->id, $advertiser->id, $campaign-
 
 echo "Created placement to be deleted with id {$placement_del->id} ...\n";
 
-$api->deleteCampaign($network->id, $advertiser->id, $campaign->id, $placement_del->id);
+$api->deletePlacement($network->id, $advertiser->id, $campaign->id, $placement_del->id);
 
 echo "Deleted placement with id {$campaign_del->id} ...\n";
 
