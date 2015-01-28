@@ -59,60 +59,97 @@ class Broadstreet
             define('CURLINFO_HTTP_CODE', 2097154);
         }
     }
+
     
     /**
-     * Magically get back business data based off a seed URL
-     * @param string $seed_url 
-     * @param int    $network_id
+     * Advertisements section
      */
-    public function magicImport($seed_url, $network_id)
-    {
-        return $this->_get("/networks/$network_id/import", array(), array('lookup' => $seed_url))->body;
-    }
-    
-    /**
-     * Create an advertiser
-     * @param string $name The name of the advertiser
-     * @return mixed
-     */
-    public function createAdvertiser($network_id, $name)
-    {
-        return $this->_post("/networks/$network_id/advertisers", array('name' => $name))->body->advertiser;
-    }
     
     /**
      * Create an advertisement
+     * @param  int $network_id
+     * @param  int $advertiser_id
+     * @param  string $name
+     * @param  string $type html|static Static refers to banner ads
+     * @param  array  $params Could be:
+     *   array('html' => 'Hello')
+     *   array('image' => 'utl_to_image')
+     *   array('image_base64' => 'base 64 image string')
+     * @return mixed
+     */
+    public function createAdvertisement($network_id, $advertiser_id, $name, $type, $params = array())
+    {
+        $params = array('name' => $name, 'type' => $type) + $params;
+        
+        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/advertisements", $params)->body->advertisement;
+    }
+
+    /**
+     * Get information about a given advertisement
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $advertisement_id
+     * @return object
+     */
+    public function getAdvertisement($network_id, $advertiser_id, $advertisement_id)
+    {
+        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id")
+                    ->body->advertisement;
+    }
+
+    /**
+     * Update an advertisement
      * @param string $name The name of the advertisement
      * @param string $type The type of advertisement
      * @return mixed
      */
-    public function createAdvertisement($network_id, $advertiser_id, $name, $type, $options = array())
+    public function updateAdvertisement($network_id, $advertiser_id, $advertisement_id, $params = array())
     {
-        $params = array('name' => $name, 'type' => $type) + $options;
-        
-        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/advertisements", $params)->body->advertisement;
+        return $this->_put("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id", $params)->body->advertisement;
+    }
+
+    /**
+     * Delete an advertisement
+     * @param string $name The name of the advertisement
+     * @param string $type The type of advertisement
+     * @return mixed
+     * @todo
+     */
+    public function deleteAdvertisement($network_id, $advertiser_id, $advertisement_id)
+    {        
+        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id")->body;
     }
     
     /**
-     * Create a network
-     * @param string $name The name of the network
-     * @param array $options An array of options
+     * Get information about a given advertisement source
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $advertisement_id
+     * @return object
      */
-    public function createNetwork($name, $options = array())
-    {
-        $options['name'] = $name;
-        return $this->_post("/networks", $options)->body->network;
+    public function getAdvertisementSource($network_id, $advertiser_id, $advertisement_id)
+    {   
+        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/source")
+                    ->body->source;
     }
     
     /**
-     * Create a basic user
-     * @param string $email 
+     * Get a report for a given advertisement for the last x days
+     * @param type $network_id
+     * @param type $advertiser_id
+     * @param type $advertisement_id
+     * @param type $start_date
+     * @param type $end_date
+     * @return type 
      */
-    public function createUser($email)
+    public function getAdvertisementReport($network_id, $advertiser_id, $advertisement_id, $start_date = false, $end_date = false)
     {
-        return $this->_post($email, $data);
+        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/records", array(), array (
+            'start_date' => $start_date,
+            'end_date'   => $end_date
+        ))->body->records;
     }
-    
+
     /**
      * Create a proof
      * @param array $params 
@@ -122,6 +159,223 @@ class Broadstreet
         return $this->_post("/advertisements/proof", $params)->body->proof;
     }
     
+    /**
+     * The the update source of an advertisement
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $advertisement_id
+     * @param string $type
+     * @param array $params
+     * @return object 
+     */
+    public function setAdvertisementSource($network_id, $advertiser_id, $advertisement_id, $type, $params = array())
+    {
+        $params = array('type' => $type) + $params;
+
+        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/source", $params)
+                    ->body->advertisement;
+    }
+
+    /**
+     * Advertiser section
+     */
+
+    /**
+     * Get a list of advertisers this token has access to 
+     * @param  int $network_id
+     * @param  int $advertiser_id
+     * @return mixed
+     */
+    public function getAdvertiser($network_id, $advertiser_id)
+    {
+        return $this->_get("/networks/$network_id/advertisers/$advertiser_id")->body->advertiser;
+    }
+
+    /**
+     * Get a list of advertisers this token has access to 
+     * @param  int $network_id
+     * @return mixed
+     */
+    public function getAdvertisers($network_id)
+    {
+        return $this->_get("/networks/$network_id/advertisers")->body->advertisers;
+    }
+
+    /**
+     * Create an advertiser
+     * @param string $name The name of the advertiser
+     * @return mixed
+     */
+    public function createAdvertiser($network_id, $name)
+    {
+        return $this->_post("/networks/$network_id/advertisers", array('name' => $name))->body->advertiser;
+    }
+
+    /**
+     * Delete an advertiser
+     * @param  int $network_id
+     * @param  int $advertiser_id
+     * @param  int $advertisement_id 
+     * @return mixed
+     */
+    public function deleteAdvertiser($network_id, $advertiser_id, $advertisement_id)
+    {        
+        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id")->body;
+    }
+
+    /**
+     * Campaign section
+     */
+    
+    /**
+     * Create a campaign
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param string $name The name of the campaign
+     * @param array $params array('start_date' => null, 'end_date' => null)
+     * @return mixed
+     * @todo
+     */
+    public function createCampaign($network_id, $advertiser_id, $name, $params = array())
+    {
+        $params = array('name' => $name) + $params;
+        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/campaigns", $params)->body->campaign;
+    }
+
+    /**
+     * Delete a campaign
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $campaign_id
+     * @return mixed
+     * @todo
+     */
+    public function deleteCampaign($network_id, $advertiser_id, $campaign_id)
+    {
+        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id")->body;
+    }
+
+    /**
+     * Placements section
+     */    
+    
+    /**
+     * Create a placement
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $campaign_id
+     * @param array $params array('zone_id' => 1234, 'advertisement_id' => 5432)
+     * @return mixed
+     * @todo
+     */
+    public function createPlacement($network_id, $advertiser_id, $campaign_id, $params = array())
+    {
+        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id/placements", $params)->body;
+    }
+
+    /**
+     * Create an advertiser
+     * @param int $network_id
+     * @param int $advertiser_id
+     * @param int $campaign_id
+     * @param int $placement_id
+     * @return mixed
+     * @todo
+     */
+    public function deletePlacement($network_id, $advertiser_id, $campaign_id, $placement_id)
+    {
+        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id/placements/$placement_id")->body;
+    }
+
+    /**
+     * Network section
+     */
+
+    /**
+     * Create a network
+     * @param string $name The name of the network
+     * @param array $params An array of options
+     * @todo
+     */
+    public function createNetwork($name, $params = array())
+    {
+        $params['name'] = $name;
+        return $this->_post("/networks", $params)->body->network;
+    }
+
+    
+    /**
+     * Get base account information for a network, including whether a card is
+     *  on file, the cost of an import (in cents), etc
+     * @param int $network_id 
+     */
+    public function getNetwork($network_id)
+    {
+        return $this->_get("/networks/$network_id")->body->network;
+    }    
+    
+    /**
+     * Get a list of networks this token has access to
+     * @return array
+     */
+    public function getNetworks()
+    {
+        return $this->_get('/networks')->body->networks;
+    }
+    
+    /**
+     * Get a list of zones under a network
+     * @param int $network_id
+     * @return object
+     */
+    public function getNetworkZones($network_id)
+    {
+        return $this->_get("/networks/$network_id/zones")->body->zones;
+    }
+
+    /**
+     * Zone section
+     */
+
+    /**
+     * Create a zone
+     * @param int $network_id
+     * @param string $name The name of the zone
+     * @param array $params array('alias' => 'optional_zone_alias', 'self_serve' => false, 'pricing_callback' => null)
+     * @return mixed
+     * @todo
+     */
+    public function createZone($network_id, $name, $params = array())
+    {
+        $params = array('name' => $name) + $params;
+        return $this->_post("/networks/$network_id/zones", $params)->body->zone;
+    }
+
+    /**
+     * Delete a zone
+     * @param int $network_id
+     * @param int $zone_id
+     * @return mixed
+     * @todo
+     */
+    public function deleteZone($network_id, $zone_id)
+    {
+        return $this->_delete("/networks/$network_id/zones/$zone_id")->body;
+    }
+
+    /**
+     * User section
+     */
+    
+    /**
+     * Create a basic user
+     * @param string $email 
+     */
+    public function createUser($email)
+    {
+        return $this->_post($email, $data);
+    }
+
     /**
      * Log in to the API, get an access token back
      * @param string $username
@@ -153,6 +407,11 @@ class Broadstreet
         # Store access token
         return $response;
     }
+
+
+    /**
+     * Misc section
+     */    
     
     /**
      * Get a list of fonts supported by Broadstreet 
@@ -163,129 +422,33 @@ class Broadstreet
     }
     
     /**
-     * Get base account information for a network, including whether a card is
-     *  on file, the cost of an import (in cents), etc
-     * @param int $network_id 
+     * Magically get back business data based off a seed URL
+     * @param string $seed_url Facebook page URL
+     * @param int    $network_id
      */
-    public function getNetwork($network_id)
+    public function magicImport($seed_url, $network_id)
     {
-        return $this->_get("/networks/$network_id")->body->network;
+        return $this->_get("/networks/$network_id/import", array(), array('lookup' => $seed_url))->body;
     }
-    
-    /**
-     * Update an advertisement
-     * @param string $name The name of the advertisement
-     * @param string $type The type of advertisement
-     * @return mixed
-     */
-    public function updateAdvertisement($network_id, $advertiser_id, $advertisement_id, $params = array())
-    {
-        return $this->_put("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id", $params)->body->advertisement;
-    }
-    
-    /**
-     * Get a list of advertisers this token has access to 
-     */
-    public function getAdvertisers($network_id)
-    {
-        return $this->_get("/networks/$network_id/advertisers")->body->advertisers;
-    }
-    
-    /**
-     * Get information about a given advertisement
-     * @param int $network_id
-     * @param int $advertiser_id
-     * @param int $advertisement_id
-     * @return object
-     */
-    public function getAdvertisement($network_id, $advertiser_id, $advertisement_id)
-    {
-        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id")
-                    ->body->advertisement;
-    }
-    
-    /**
-     * Get information about a given advertisement source
-     * @param int $network_id
-     * @param int $advertiser_id
-     * @param int $advertisement_id
-     * @return object
-     */
-    public function getAdvertisementSource($network_id, $advertiser_id, $advertisement_id)
-    {   
-        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/source")
-                    ->body->source;
-    }
-    
-    /**
-     * Get a list of networks this token has access to
-     * @return array
-     */
-    public function getNetworks()
-    {
-        return $this->_get('/networks')->body->networks;
-    }
-    
-    /**
-     * Get a report for a given advertisement for the last x days
-     * @param type $network_id
-     * @param type $advertiser_id
-     * @param type $advertisement_id
-     * @param type $start_date
-     * @param type $end_date
-     * @return type 
-     */
-    public function getAdvertisementReport($network_id, $advertiser_id, $advertisement_id, $start_date = false, $end_date = false)
-    {
-        return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/records", array(), array (
-            'start_date' => $start_date,
-            'end_date'   => $end_date
-        ))->body->records;
-    }
-    
-    /**
-     * Get a list of zones under a network
-     * @return object
-     */
-    public function getNetworkZones($network_id)
-    {
-        return $this->_get("/networks/$network_id/zones")->body->zones;
-    }
-    
-    /**
-     * The the update source of an advertisement
-     * @param int $network_id
-     * @param int $advertiser_id
-     * @param int $advertisement_id
-     * @param string $type
-     * @param array $options
-     * @return object 
-     */
-    public function setAdvertisementSource($network_id, $advertiser_id, $advertisement_id, $type, $options = array())
-    {
-        $params = array('type' => $type) + $options;
 
-        return $this->_post("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/source", $params)
-                    ->body->advertisement;
-    }
     
     /**
      * Gets a response from the server
      * @param string $uri
-     * @param array $options
+     * @param array $params
      * @param array $query_args
      * @return type
      * @throws Broadstreet_DependencyException 
      * @throws Broadstreet_AuthException 
      */
-    protected function _get($uri, $options = array(), $query_args = array())
+    protected function _get($uri, $params = array(), $query_args = array())
     {
         $url = $this->_buildRequestURL($uri, $query_args);
 
         # If the Wordpress HTTP library is loaded, use it
         if(function_exists('wp_remote_post'))
         {
-            list($body, $status) = $this->_wpGet($url, $options);
+            list($body, $status) = $this->_wpGet($url, $params);
         }
         else
         {
@@ -295,7 +458,7 @@ class Broadstreet
                 throw new Broadstreet_DependencyException("The cURL module must be installed");
             }
             
-            list($body, $status) = $this->_curlGet($url, $options);
+            list($body, $status) = $this->_curlGet($url, $params);
         }
         
         if($status == '403')
@@ -310,7 +473,7 @@ class Broadstreet
         
         if($status[0] != '2')
         {
-            throw new Broadstreet_ServerException("Server threw HTTP $status for call to $uri with cURL params " . print_r($options, true) . "; Response: " . $body, @json_decode($body));
+            throw new Broadstreet_ServerException("Server threw HTTP $status for call to $uri with cURL params " . print_r($params, true) . "; Response: " . $body, @json_decode($body));
         }
 
         return (object)(array('url' => $url, 'body' => @json_decode($body), 'status' => $status));
@@ -320,10 +483,10 @@ class Broadstreet
      * Issue a network request using the built-in Wordpress libraries
      *  Intended for use within Wordpress for extra portability
      * @param string $url
-     * @param array $options cURL options. Limited support
+     * @param array $params cURL options. Limited support
      * @return array(body, status_code)
      */
-    protected function _wpGet($url, $options = array())
+    protected function _wpGet($url, $params = array())
     {
         $params = array (
             'method'      => 'GET',
@@ -334,18 +497,18 @@ class Broadstreet
         );
         
         # Handle POST Requests
-        if(isset($options[CURLOPT_POST]))
+        if(isset($params[CURLOPT_POST]))
         {
             $params['method'] = 'POST';
-            $params['body']   = $options[CURLOPT_POSTFIELDS];
+            $params['body']   = $params[CURLOPT_POSTFIELDS];
         }
         
         # Handle PUT
-        if(isset($options[CURLOPT_CUSTOMREQUEST])
-            && $options[CURLOPT_CUSTOMREQUEST] == 'PUT')
+        if(isset($params[CURLOPT_CUSTOMREQUEST])
+            && $params[CURLOPT_CUSTOMREQUEST] == 'PUT')
         {
             $params['method'] = 'PUT';
-            $params['body']   = $options[CURLOPT_POSTFIELDS];
+            $params['body']   = $params[CURLOPT_POSTFIELDS];
         }
         
         $body     = '{}';
@@ -366,15 +529,15 @@ class Broadstreet
     /**
      * Issue a network request using cURL
      * @param string $url
-     * @param array  $options
+     * @param array  $params
      * @return array(body, status_code)
      */
-    protected function _curlGet($url, $options = array())
+    protected function _curlGet($url, $params = array())
     {
         $curl_handle = curl_init($url);
-        $options    += array(CURLOPT_RETURNTRANSFER => true);
+        $params    += array(CURLOPT_RETURNTRANSFER => true);
 
-        curl_setopt_array($curl_handle, $options);
+        curl_setopt_array($curl_handle, $params);
 
         $body   = curl_exec($curl_handle);
         $status = (string)curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
@@ -403,16 +566,30 @@ class Broadstreet
      * @param array $data Assoc. array of post data
      * @return mixed
      */
-    public function _put($uri, $data = false, $options = array())
+    public function _put($uri, $data = false, $params = array())
     {
         $data    = http_build_query($data);
 
-        $options = array (
+        $params = array (
                         CURLOPT_CUSTOMREQUEST => 'PUT',
                         CURLOPT_POSTFIELDS    => $data
-                        ) + $options;
+                        ) + $params;
         
-        $result = $this->_get($uri, $options);
+        $result = $this->_get($uri, $params);
+        
+        return $result;
+    }   
+
+    /**
+     * DELETE data on the server
+     * @param string $uri
+     * @return mixed
+     */
+    public function _delete($uri)
+    {
+        $params = array (CURLOPT_CUSTOMREQUEST => 'DELETE');
+        
+        $result = $this->_get($uri, $params);
         
         return $result;
     }   
