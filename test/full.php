@@ -26,6 +26,12 @@ $advertisement = $api->createAdvertisement($network->id, $advertiser->id, 'API T
 
 echo "Created advertisement with id {$advertisement->id} ...\n";
 
+$advertisement_del = $api->createAdvertisement($network->id, $advertiser->id, 'API Test Advertisement', 'html', array (
+	'html' => "<h1>API Test Advertisement. TO DELETE</h1><script>document.write('On advertiser {$advertiser->id}');</script>"
+));
+
+echo "Created advertisement to be deleted with id {$advertisement->id} ...\n";
+
 $campaign = $api->createCampaign($network->id, $advertiser->id, 'API Test Campaign', $params = array (
 	'start_date' => '2014-01-01 00:00:00',
 	'end_date' => '2017-01-01 00:00:00'
@@ -49,18 +55,25 @@ $placement = $api->createPlacement($network->id, $advertiser->id, $campaign->id,
 	'zone_id' => $zone->id
 ));
 
-echo "Created placement with id {$placement->id} ...\n";
+echo "Created placement for ad {$advertisement->id} and zone {$zone->id}...\n";
 
 $placement_del = $api->createPlacement($network->id, $advertiser->id, $campaign->id, $params = array (
-	'advertisement_id' => $advertisement->id,
+	'advertisement_id' => $advertisement_del->id,
 	'zone_id' => $zone->id
 ));
 
-echo "Created placement to be deleted with id {$placement_del->id} ...\n";
+echo "Created placement for ad {$advertisement_del->id} and zone {$zone->id}...\n";
 
-$api->deletePlacement($network->id, $advertiser->id, $campaign->id, $placement_del->id);
+$api->deletePlacement($network->id, $advertiser->id, $campaign->id, $params = array (
+	'advertisement_id' => $advertisement_del->id,
+	'zone_id' => $zone->id
+));
 
-echo "Deleted placement with id {$campaign_del->id} ...\n";
+echo "Deleted placement for ad {$advertisement_del->id} and zone {$zone->id}...\n";
+
+$api->deleteAdvertisement($network->id, $advertiser->id, $advertisement_del->id);
+
+echo "Deleted advertisement {$advertisement_del->id}... \n";
 
 echo "Done\n";
 
