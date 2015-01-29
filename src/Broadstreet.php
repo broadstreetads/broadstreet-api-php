@@ -181,7 +181,7 @@ class Broadstreet
      */
 
     /**
-     * Get a list of advertisers this token has access to 
+     * Get an advertiser this token has access to 
      * @param  int $network_id
      * @param  int $advertiser_id
      * @return mixed
@@ -274,17 +274,17 @@ class Broadstreet
     }
 
     /**
-     * Create an advertiser
+     * Delete a placement
      * @param int $network_id
      * @param int $advertiser_id
      * @param int $campaign_id
-     * @param int $placement_id
+     * @param array $params array('zone_id' => 1234, 'advertisement_id' => 5432)
      * @return mixed
      * @todo
      */
-    public function deletePlacement($network_id, $advertiser_id, $campaign_id, $placement_id)
-    {
-        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id/placements/$placement_id")->body;
+    public function deletePlacement($network_id, $advertiser_id, $campaign_id, $params = array())
+    {        
+        return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id", $params)->body;
     }
 
     /**
@@ -463,7 +463,7 @@ class Broadstreet
         
         if($status == '403')
         {
-            throw new Broadstreet_ServerException("Broadstreet API Auth Denied (HTTP 403)", @json_decode($body));
+            throw new Broadstreet_ServerException("Broadstreet API Auth Denied (HTTP 403) for $url", @json_decode($body));
         }
         
         if($status == '500')
@@ -583,16 +583,18 @@ class Broadstreet
     /**
      * DELETE data on the server
      * @param string $uri
+     * @param string $data Query strng data
+     * @param array query args
      * @return mixed
      */
-    public function _delete($uri)
+    public function _delete($uri, $query_params = array())
     {
         $params = array (CURLOPT_CUSTOMREQUEST => 'DELETE');
         
-        $result = $this->_get($uri, $params);
+        $result = $this->_get($uri, $params, $query_params);
         
         return $result;
-    }   
+    }
     
     /**
      * Build a valid request URL from the URI given and the API key
