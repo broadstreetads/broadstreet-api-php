@@ -1,12 +1,12 @@
 # Broadstreet PHP API Client
 
-This is an API client for Broadstreet Ads. Usage of this client requires that you have an account with Broadstreet, and have an access token.
+This is an API client for Broadstreet Ads. Usage of this client requires that you have an account with Broadstreet, and have an [access token](https://my.broadstreetads.com/access-token).
 
 ## Example Usage
 
     $network_id    = '12345'; // Something you have access to
     $advertiser_id = '12345'; // And advertiser under that network
-    $access_token  = 'your access token here';
+    $access_token  = 'your access token here'; // see https://my.broadstreetads.com/access-token
     
     try
     {
