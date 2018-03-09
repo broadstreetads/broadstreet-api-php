@@ -9,30 +9,30 @@ if(!class_exists('Broadstreet')):
 
 /**
  * This is the PHP client and class for Broadstreet
- * It requires cURL 
+ * It requires cURL
  */
 class Broadstreet
 {
     const API_VERSION = '0';
-    
+
     /**
      * The API Key used for auth
      * @var string
      */
     protected $accessToken = null;
-    
+
     /**
      * The hostname to point at
      * @var string
      */
     protected $host = 'api.broadstreetads.com';
-    
+
     /**
      * Use SSL? You should.
-     * @var bool 
+     * @var bool
      */
     protected $use_ssl = true;
-    
+
     /**
      * The constructor
      * @param string $access_token A user's access token
@@ -45,10 +45,10 @@ class Broadstreet
         {
             $this->host = $host;
         }
-        
+
         $this->accessToken = $access_token;
         $this->use_ssl     = $secure;
-        
+
         /* Define cURL constants if needed */
         if(!defined('CURLOPT_POST'))
         {
@@ -60,11 +60,11 @@ class Broadstreet
         }
     }
 
-    
+
     /**
      * Advertisements section
      */
-    
+
     /**
      * Create an advertisement
      * @param  int $network_id
@@ -80,7 +80,7 @@ class Broadstreet
     public function createAdvertisement($network_id, $advertiser_id, $name, $type, $params = array())
     {
         $params = array('name' => $name, 'type' => $type) + $params;
-        
+
         return $this->_post("/networks/$network_id/advertisers/$advertiser_id/advertisements", $params)->body->advertisement;
     }
 
@@ -116,10 +116,10 @@ class Broadstreet
      * @todo
      */
     public function deleteAdvertisement($network_id, $advertiser_id, $advertisement_id)
-    {        
+    {
         return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id")->body;
     }
-    
+
     /**
      * Get information about a given advertisement source
      * @param int $network_id
@@ -128,11 +128,11 @@ class Broadstreet
      * @return object
      */
     public function getAdvertisementSource($network_id, $advertiser_id, $advertisement_id)
-    {   
+    {
         return $this->_get("/networks/$network_id/advertisers/$advertiser_id/advertisements/$advertisement_id/source")
                     ->body->source;
     }
-    
+
     /**
      * Get a report for a given advertisement for the last x days
      * @param type $network_id
@@ -140,7 +140,7 @@ class Broadstreet
      * @param type $advertisement_id
      * @param type $start_date
      * @param type $end_date
-     * @return type 
+     * @return type
      */
     public function getAdvertisementReport($network_id, $advertiser_id, $advertisement_id, $start_date = false, $end_date = false)
     {
@@ -152,13 +152,13 @@ class Broadstreet
 
     /**
      * Create a proof
-     * @param array $params 
+     * @param array $params
      */
     public function createProof($params)
     {
         return $this->_post("/advertisements/proof", $params)->body->proof;
     }
-    
+
     /**
      * The the update source of an advertisement
      * @param int $network_id
@@ -166,7 +166,7 @@ class Broadstreet
      * @param int $advertisement_id
      * @param string $type
      * @param array $params
-     * @return object 
+     * @return object
      */
     public function setAdvertisementSource($network_id, $advertiser_id, $advertisement_id, $type, $params = array())
     {
@@ -181,7 +181,7 @@ class Broadstreet
      */
 
     /**
-     * Get an advertiser this token has access to 
+     * Get an advertiser this token has access to
      * @param  int $network_id
      * @param  int $advertiser_id
      * @return mixed
@@ -192,7 +192,7 @@ class Broadstreet
     }
 
     /**
-     * Get a list of advertisers this token has access to 
+     * Get a list of advertisers this token has access to
      * @param  int $network_id
      * @return mixed
      */
@@ -215,18 +215,18 @@ class Broadstreet
      * Delete an advertiser
      * @param  int $network_id
      * @param  int $advertiser_id
-     * @param  int $advertisement_id 
+     * @param  int $advertisement_id
      * @return mixed
      */
     public function deleteAdvertiser($network_id, $advertiser_id, $advertisement_id)
-    {        
+    {
         return $this->_delete("/networks/$network_id/advertisers/$advertiser_id")->body;
     }
 
     /**
      * Campaign section
      */
-    
+
     /**
      * Create a campaign
      * @param int $network_id
@@ -257,8 +257,8 @@ class Broadstreet
 
     /**
      * Placements section
-     */    
-    
+     */
+
     /**
      * Create a placement
      * @param int $network_id
@@ -283,7 +283,7 @@ class Broadstreet
      * @todo
      */
     public function deletePlacement($network_id, $advertiser_id, $campaign_id, $params = array())
-    {        
+    {
         return $this->_delete("/networks/$network_id/advertisers/$advertiser_id/campaigns/$campaign_id", $params)->body;
     }
 
@@ -303,17 +303,17 @@ class Broadstreet
         return $this->_post("/networks", $params)->body->network;
     }
 
-    
+
     /**
      * Get base account information for a network, including whether a card is
      *  on file, the cost of an import (in cents), etc
-     * @param int $network_id 
+     * @param int $network_id
      */
     public function getNetwork($network_id)
     {
         return $this->_get("/networks/$network_id")->body->network;
-    }    
-    
+    }
+
     /**
      * Get a list of networks this token has access to
      * @return array
@@ -322,7 +322,7 @@ class Broadstreet
     {
         return $this->_get('/networks')->body->networks;
     }
-    
+
     /**
      * Get a list of zones under a network
      * @param int $network_id
@@ -366,10 +366,10 @@ class Broadstreet
     /**
      * User section
      */
-    
+
     /**
      * Create a basic user
-     * @param string $email 
+     * @param string $email
      */
     public function createUser($email)
     {
@@ -379,31 +379,31 @@ class Broadstreet
     /**
      * Log in to the API, get an access token back
      * @param string $username
-     * @param string $password 
+     * @param string $password
      */
     public function login($email, $password)
     {
         $params   = array('email' => $email, 'password' => $password);
         $response = $this->_post("/sessions", $params)->body->user;
-        
+
         $this->accessToken = $response->access_token;
-        
+
         # Store access token
         return $response;
     }
-    
+
     /**
      * Register a new user
      * @param string $username
-     * @param string $password 
+     * @param string $password
      */
     public function register($email)
     {
         $params   = array('email' => $email);
         $response = $this->_post("/users", $params)->body->user;
-        
+
         $this->accessToken = $response->access_token;
-        
+
         # Store access token
         return $response;
     }
@@ -411,16 +411,16 @@ class Broadstreet
 
     /**
      * Misc section
-     */    
-    
+     */
+
     /**
-     * Get a list of fonts supported by Broadstreet 
+     * Get a list of fonts supported by Broadstreet
      */
     public function getFonts()
     {
         return $this->_get("/fonts")->body->fonts;
     }
-    
+
     /**
      * Magically get back business data based off a seed URL
      * @param string $seed_url Facebook page URL
@@ -431,15 +431,15 @@ class Broadstreet
         return $this->_get("/networks/$network_id/import", array(), array('lookup' => $seed_url))->body;
     }
 
-    
+
     /**
      * Gets a response from the server
      * @param string $uri
      * @param array $params
      * @param array $query_args
      * @return type
-     * @throws Broadstreet_DependencyException 
-     * @throws Broadstreet_AuthException 
+     * @throws Broadstreet_DependencyException
+     * @throws Broadstreet_AuthException
      */
     protected function _get($uri, $params = array(), $query_args = array())
     {
@@ -457,20 +457,20 @@ class Broadstreet
             {
                 throw new Broadstreet_DependencyException("The cURL module must be installed");
             }
-            
+
             list($body, $status) = $this->_curlGet($url, $params);
         }
-        
+
         if($status == '403')
         {
             throw new Broadstreet_ServerException("Broadstreet API Auth Denied (HTTP 403) for $url", @json_decode($body));
         }
-        
+
         if($status == '500')
         {
             throw new Broadstreet_ServerException("Broadstreet API had a 500 error");
         }
-        
+
         if($status[0] != '2')
         {
             throw new Broadstreet_ServerException("Server threw HTTP $status for call to $uri with cURL params " . print_r($params, true) . "; Response: " . $body, @json_decode($body));
@@ -478,7 +478,7 @@ class Broadstreet
 
         return (object)(array('url' => $url, 'body' => @json_decode($body), 'status' => $status));
     }
-    
+
     /**
      * Issue a network request using the built-in Wordpress libraries
      *  Intended for use within Wordpress for extra portability
@@ -495,14 +495,14 @@ class Broadstreet
             'httpversion' => '1.0',
             'blocking'    => true
         );
-        
+
         # Handle POST Requests
         if(isset($params[CURLOPT_POST]))
         {
             $params['method'] = 'POST';
             $params['body']   = $params[CURLOPT_POSTFIELDS];
         }
-        
+
         # Handle PUT
         if(isset($params[CURLOPT_CUSTOMREQUEST])
             && $params[CURLOPT_CUSTOMREQUEST] == 'PUT')
@@ -510,11 +510,11 @@ class Broadstreet
             $params['method'] = 'PUT';
             $params['body']   = $params[CURLOPT_POSTFIELDS];
         }
-        
+
         $body     = '{}';
         $status   = false;
         $response = @wp_remote_post($url, $params);
-        
+
         if(isset($response['response'])
                 && isset($response['body'])
                 && isset($response['response']['code']))
@@ -522,10 +522,10 @@ class Broadstreet
             $body   = $response['body'];
             $status = (string)$response['response']['code'];
         }
-        
+
         return array($body, $status);
     }
-    
+
     /**
      * Issue a network request using cURL
      * @param string $url
@@ -541,11 +541,11 @@ class Broadstreet
 
         $body   = curl_exec($curl_handle);
         $status = (string)curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
-        
+
         return array($body, $status);
     }
-    
-    
+
+
     /**
      * POST data to the server
      * @param string $uri
@@ -554,12 +554,12 @@ class Broadstreet
      */
     protected function _post($uri, $data)
     {
-        return $this->_get($uri, array(                                        
+        return $this->_get($uri, array(
             CURLOPT_POST       => true,
             CURLOPT_POSTFIELDS => $data)
         );
     }
-    
+
     /**
      * PUT data to the server
      * @param string $uri
@@ -574,11 +574,11 @@ class Broadstreet
                         CURLOPT_CUSTOMREQUEST => 'PUT',
                         CURLOPT_POSTFIELDS    => $data
                         ) + $params;
-        
+
         $result = $this->_get($uri, $params);
-        
+
         return $result;
-    }   
+    }
 
     /**
      * DELETE data on the server
@@ -590,16 +590,16 @@ class Broadstreet
     public function _delete($uri, $query_params = array())
     {
         $params = array (CURLOPT_CUSTOMREQUEST => 'DELETE');
-        
+
         $result = $this->_get($uri, $params, $query_params);
-        
+
         return $result;
     }
-    
+
     /**
      * Build a valid request URL from the URI given and the API key
      * @param string $uri
-     * @return string 
+     * @return string
      */
     protected function _buildRequestURL($uri, $query_args = array())
     {
@@ -623,7 +623,7 @@ class Broadstreet_AuthException extends Broadstreet_GeneralException {}
 class Broadstreet_ServerException extends Broadstreet_GeneralException {
     /**
      * The error object
-     * @var object 
+     * @var object
      */
     public $error;
     public function __construct($message, $error = '') {
