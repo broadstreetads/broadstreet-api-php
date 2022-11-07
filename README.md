@@ -13,8 +13,16 @@ This is an API client for Broadstreet Ads. Usage of this client requires that yo
         $client = new Broadstreet($access_token);
         
         /* Create an ad */
-        $ad = $client->createAdvertisement($network_id, $advertiser_id, 'New Ad!', 'text', array (
-            'default_text' => 'This is the message'
+        $ad = $client->createAdvertisement($network_id, $advertiser_id, 'New HTML Ad!', 'html', array (
+            'html' => '<script>alert("everybody loves these")</script>'
+        ));
+
+        $ad = $client->createAdvertisement($network_id, $advertiser_id, 'New Banner Ad from Local File!', 'static', array (
+            'active_base64' => base64_encode(file_get_contents('banner.png'))
+        ));
+
+        $ad = $client->createAdvertisement($network_id, $advertiser_id, 'New Ad from Remote!', 'static', array (
+            'active_url' => 'https://placehold.jp/300x250.png'
         ));
         
         /* Print ad code */

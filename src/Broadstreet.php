@@ -13,7 +13,7 @@ if(!class_exists('Broadstreet')):
  */
 class Broadstreet
 {
-    const API_VERSION = '0';
+    const API_VERSION = '1';
 
     /**
      * The API Key used for auth
