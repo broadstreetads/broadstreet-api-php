@@ -2,13 +2,13 @@
 
 # run this script from within the test directory
 
-require '../src/Broadstreet.php';
+require dirname(__FILE__) . '/../src/Broadstreet.php';
 
 if(count($argv) < 2) die("Supply an access token as the first parameter: php full.php acdef...\n");
 
 $token = $argv[1];
 
-$api = new Broadstreet($token);
+$api = new Broadstreet($token, 'localhost:3000', false);
 
 $network = $api->createNetwork('API Test');
 //$network = (object)(array('id' => 109));
@@ -24,14 +24,23 @@ $advertiser = $api->createAdvertiser($network->id, 'API Test v1 Advertiser');
 echo "Created advertiser with id {$advertiser->id} ...\n";
 
 $advertisement = $api->createAdvertisement($network->id, $advertiser->id, 'API Test Advertisement', 'html', array (
-	'html' => "<h1>API Test Advertisement</h1><script>document.write('On advertiser {$advertiser->id}');</script>"
+	'html' => "<h1>API Test Advertisement</h1><script>alert('On advertiser {$advertiser->id}');</script>"
 ));
 
 echo "Created advertisement with id {$advertisement->id} ...\n";
 
-$advertisement_del = $api->createAdvertisement($network->id, $advertiser->id, 'API Test Advertisement: HTML', 'html', array (
-	'html' => "<h1>API Test Advertisement. TO DELETE</h1><script>document.write('On advertiser {$advertiser->id}');</script>"
+$api->updateAdvertisement($network->id, $advertiser->id, $advertisement->id, array (
+	'html' => "<h1>Updated API Test Advertisement</h1><script>alert('On advertiser {$advertiser->id}');</script>",
+	'name' => "API Test Advertisement (Updated)"
 ));
+
+echo "Updated advertisement with id {$advertisement->id} ...\n";
+
+$advertisement_del = $api->createAdvertisement($network->id, $advertiser->id, 'API Test Advertisement: HTML', 'html', array (
+	'html' => "<h1>API Test Advertisement. TO DELETE</h1><script>alert('On advertiser {$advertiser->id}');</script>"
+));
+
+echo "Created advertisement to be deleted with id {$advertisement->id} ...\n";
 
 $advertisement_static = $api->createAdvertisement($network->id, $advertiser->id, 'API Test Advertisement: Static', 'static', array (
 	'active_url' => "https://street-production.s3.us-east-1.amazonaws.com/300x250.png"
@@ -41,11 +50,9 @@ $advertisement_base64 = $api->createAdvertisement($network->id, $advertiser->id,
 	'active_base64' => base64_encode(file_get_contents("banner.png"))
 ));
 
-echo "Created advertisement to be deleted with id {$advertisement->id} ...\n";
-
 $campaign = $api->createCampaign($network->id, $advertiser->id, 'API Test Campaign', $params = array (
-	'start_date' => '2014-01-01 00:00:00',
-	'end_date' => '2017-01-01 00:00:00'
+	'start_date' => '2024-01-01 00:00:00',
+	'end_date' => '2024-12-31 00:00:00'
 ));
 
 echo "Created campaign with id {$campaign->id} ...\n";
