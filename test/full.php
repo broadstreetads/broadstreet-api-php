@@ -8,7 +8,7 @@ if(count($argv) < 2) die("Supply an access token as the first parameter: php ful
 
 $token = $argv[1];
 
-$api = new Broadstreet($token, 'localhost:3000', false);
+$api = new Broadstreet($token);
 
 $network = $api->createNetwork('API Test');
 //$network = (object)(array('id' => 109));
